@@ -1,0 +1,183 @@
+@* @page
+@model  
+@{
+    ViewData["Title"] = "Learning Results";
+}
+
+@section Scripts {
+    <script>
+        
+        const insertModal = document.getElementById('insertModal');
+        const editModal = document.getElementById('editModal');
+        const deleteModal = document.getElementById('deleteModal');
+
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            // Lấy dữ liệu từ thuộc tính data-
+            const id = button.getAttribute('data-id');
+            const score = button.getAttribute('data-score');
+
+            // Gán vào các field trong modal
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-score').value = score;
+        });
+        
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const fullname = button.getAttribute('data-fullname');
+            const subjectname = button.getAttribute('data-subjectname');
+
+            document.getElementById('delete-id').value = id;
+            document.getElementById('delete-fullname').textContent = fullname;
+            document.getElementById('delete-subjectname').textContent = subjectname;
+        });
+    </script>
+}
+
+
+<h1> Student name:  @Model.Fullname - @Model.Id</h1>
+
+<button type="button" class="btn btn-outline-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#insertModal">
+    <i class="bi bi-database-add"></i>
+</button>
+
+@if (Model.LearningResults != null && Model.LearningResults.Any()){
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Semester</th>
+                <th>Credits</th>
+                <th>Score</th>
+                <th>Grade</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model.LearningResults)
+            {
+                <tr>
+                    <td>@result.SubjectName</td>
+                    <td>@result.Semester</td>
+                    <td>@result.Credits</td>
+                    <td>@result.Score</td>
+                    <td>@result.Grade</td>
+                    <td>@result.CreatedAt</td>
+                    <td>@result.UpdatedAt</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary" 
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editModal"
+                                  data-id="@result.Id"
+                                  data-score="@result.Score">
+                              Edit Score
+                          </button>
+                          <button type="button" class="btn btn-outline-danger"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteModal"
+                              data-id="@result.Id"
+                              data-fullname="@Model.Fullname"
+                              data-subjectname="@result.SubjectName">
+                              Delete 
+                          </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}else{
+    <p>No learning results found.</p>
+}
+
+<div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Insert">
+        <div class="modal-header">
+          <h5 class="modal-title" id="insertModalLabel">Insert</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+             <input type="hidden" class="form-control" name="studentid" id="insert-studentid" value="@Model.Id"/>
+             <input type="hidden" class="form-control" name="fullnamestudent" id="insert-fullnamestudent" value="@Model.Fullname"/>
+            <div class="mb-3">
+                <label for="insert-subjectname" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" name="subjectname" id="insert-subjectname" />
+            </div>
+            <div class="mb-3">
+                <label for="insert-semester" class="form-label">semester</label>
+                <input type="text" class="form-control" name="semester" id="insert-semester" />
+            </div>
+            <div class="mb-3">
+                <label for="insert-credits" class="form-label">credits</label>
+                <input type="text" class="form-control" name="credits" id="insert-credits" />
+            </div>
+            <div class="mb-3">
+                <label for="insert-score" class="form-label">score</label>
+                <input type="number" step="0.1" class="form-control" name="score" id="insert-score" />
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Insert</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Edit">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit score</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="id" id="edit-id" />
+            <div class="mb-3">
+                <input type="hidden" class="form-control" name="studentid" id="insert-studentid" value="@Model.Id"/>
+                <input type="hidden" class="form-control" name="fullnamestudent" id="insert-fullnamestudent" value="@Model.Fullname"/>
+                <label for="edit-score" class="form-label">Score</label>
+                <input type="number" step="0.1" class="form-control" name="score" id="edit-score" />
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Delete">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" class="form-control" name="studentid" id="insert-studentid" value="@Model.Id"/>
+            <input type="hidden" class="form-control" name="fullnamestudent" id="insert-fullnamestudent" value="@Model.Fullname"/>
+            <input type="hidden" name="id" id="delete-id" />
+            <p>Are you sure you want to delete score <strong id="delete-subjectname"></strong> of student?: <strong id="delete-fullname"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> *@

@@ -1,0 +1,175 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@section Scripts {
+    <script>
+        
+        const deleteModal = document.getElementById('deleteModal');
+        
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const fullname = button.getAttribute('data-fullname');
+
+            document.getElementById('delete-id').value = id;
+            document.getElementById('delete-fullname').textContent = fullname;
+            document.getElementById('delete').textContent = id;
+        });
+    </script>
+}
+
+<button type="button" class="btn btn-outline-primary"
+                              data-bs-toggle="modal"
+                              data-bs-target="#searchModal">
+                              Search 
+                          </button>
+
+<button type="button" class="btn btn-outline-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#insertModal">
+    <i class="bi bi-database-add"></i>
+  </button>
+
+<div class="text-center">
+
+  
+
+    <table class="table">
+        <thead>
+            <tr>
+              <th scope="col">Ma phong tro</Main></th>
+              <th scope="col">Ten nguoi Thue tro</th>
+              <th scope="col">So dien thoai</th>
+              <th scope="col">Ngay bat dau thue</th>
+              <th scope="col">Hinh thuc thanh toan</th>
+              <th scope="col">Ghi chu</th>
+              <th scope="col">Hanh dong</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            @foreach (var phongtro in Model.Phongtros)
+            {
+                <tr>
+                    <td>@phongtro.Id</td>
+                    <td>@phongtro.TenNguoiThue</td>
+                    <td>@phongtro.SDT</td>
+                    <td>@phongtro.NgayThue</td>
+                    
+                      @if (phongtro.id_hinh_thuc_thanh_toan == 1){
+                        <td>Theo Thang</td>
+                      }
+                      
+                        @if (phongtro.id_hinh_thuc_thanh_toan == 2){
+                        <td>Theo Quy</td>
+                      }
+                      
+                      @if (phongtro.id_hinh_thuc_thanh_toan == 3){
+                        <td>Theo Nam</td>
+                      }
+                    
+                    <td>@phongtro.GhiChu</td>
+                    
+                    <td>
+                        <div class="d-inline">
+                          <button type="button" class="btn btn-outline-danger"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteModal"
+                              data-id="@phongtro.Id"
+                              data-fullname="@phongtro.TenNguoiThue">
+                              Xoa 
+                          </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Search">
+        <div class="modal-body">
+          <div class="mb-3">
+                  <label for="insert-thongtin" class="form-label">Nhap thong tin can tim</label>
+                  <input type="text" class="form-control" name="thongtin" id="insert-thongtin" />
+              </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Search</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Delete">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="id" id="delete-id" />
+            <p>Bạn có chắc muốn xóa thong tin thue tro cua 
+             <strong id="delete-fullname"></strong> Ma phong: <strong id="delete"></strong>?
+            </p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Xóa</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="Insert">
+        <div class="modal-header">
+          <h5 class="modal-title" id="insertModalLabel">Insert</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+  
+            <div class="mb-3">
+                <label for="insert-tennguoithue" class="form-label">Ten nguoi thue</label>
+                <input type="text" class="form-control" name="tennguoithue" id="insert-tennguoithue" />
+            </div>
+            <div class="mb-3">
+                <label for="insert-sdt" class="form-label">So dien thaoi</label>
+                <input type="text" class="form-control" name="sdt" id="insert-sdt" />
+            </div>
+            <div class="mb-3">
+                <label for="insert-hinhthucthanhtoan" class="form-label">Hinhh thuc Thhanh Toan</label>
+                <input type="number" class="form-control" name="hinhthucthanhtoan" id="insert-hinhthucthanhtoan" placeholder="1: Theo Thang, 2: Theo Quy, 3: Theo Nam"/>
+            </div>
+             <div class="mb-3">
+                <label for="insert-ghichu" class="form-label">Ghi chu</label>
+                <input type="text" class="form-control" name="ghichu" id="insert-ghichu" />
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Them</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
